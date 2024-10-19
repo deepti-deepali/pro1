@@ -1,42 +1,29 @@
-pipeline{
+pipeline {
     agent any
     stages{
-        stage('checkout the code from github'){
+        stage('build project'){
             steps{
-                 git url: 'https://github.com/deepti-deepali/pro1'
-                 echo 'github url checkout'
+                git url:'https://github.com/deepti-deepali/pro1', branch: "master"
+                sh 'mvn clean package'
+              
             }
         }
-        stage('codecompile with deepti'){
+        stage('Build docker image'){
             steps{
-                echo 'starting compiling'
-                sh 'mvn compile'
+                script{
+                    sh 'docker build -t akshu20791/staragileprojectfinance:v1 .'
+                    sh 'docker images'
+                }
             }
         }
-        stage('codetesting with deepti'){
-            steps{
-                sh 'mvn test'
+         
+        
+     stage('Deploy') {
+            steps {
+                sh 'sudo docker run -itd --name My-first-containe21211 -p 8083:8081 akshu20791/staragileprojectfinance:v1'
+                  
+                }
             }
-        }
-        stage('qa with deepti'){
-            steps{
-                sh 'mvn checkstyle:checkstyle'
-            }
-        }
-        stage('package with deepti'){
-            steps{
-                sh 'mvn package'
-            }
-        }
-        stage('run dockerfile'){
-          steps{
-               sh 'docker build -t myimg .'
-           }
-         }
-        stage('port expose'){
-            steps{
-                sh 'docker run -dt -p 8091:8091 --name c000 myimg'
-            }
-        }   
+        
     }
 }
