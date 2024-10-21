@@ -1,29 +1,42 @@
-pipeline {
+pipeline{
     agent any
     stages{
-        stage('build project'){
+        stage('checkout the code from github'){
             steps{
-                git url:'https://github.com/deepti-deepali/pro1', branch: "master"
-                sh 'mvn clean package'
-              
+                 git url: 'https://github.com/deepti-deepali/pro1'
+                 echo 'github url checkout'
             }
         }
-        stage('Build docker image'){
+        stage('codecompile with akshat'){
             steps{
-                script{
-                    sh 'docker build -t akshu20791/staragileprojectfinance:v1 .'
-                    sh 'docker images'
-                }
+                echo 'starting compiling'
+                sh 'mvn compile'
             }
         }
-         
-        
-     stage('Deploy') {
-            steps {
-                sh 'sudo docker run -itd --name My-first-containe21211 -p 8083:8081 akshu20791/staragileprojectfinance:v1'
-                  
-                }
+        stage('codetesting with akshat'){
+            steps{
+                sh 'mvn test'
             }
-        
+        }
+        stage('qa with akshat'){
+            steps{
+                sh 'mvn checkstyle:checkstyle'
+            }
+        }
+        stage('package with akshat'){
+            steps{
+                sh 'mvn package'
+            }
+        }
+        stage('run dockerfile'){
+          steps{
+               sh 'docker build -t myimg .'
+           }
+         }
+        stage('port expose'){
+            steps{
+                sh 'docker run -dt -p 8091:8091 --name c000 myimg'
+            }
+        }   
     }
 }
